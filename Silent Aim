@@ -51,10 +51,22 @@ local Old = hookmetamethod(game, "__namecall", function(Self, ...))
     local Method = getnamecallmethod()
 
     if not checkcaller() and Method == "FireServer" then
-        Args[1] = GetClosest().Character.Head
-        Args[2] = GetClosest().Character.Head.Position
-        return Self.FireServer(self,unpack(args))
+        if Self.Name == "0+." then
+        Args[1].MessageWarning = {}
+        Args[1].MessageError = {}
+        Args[1].MessageOutput = {}
+        Args[1].MessageInfo = {}
+        elseif Self.Name == "RemoteEevnt" and Args[2] == "Bullet" and Method == "FireServer" then
+            if Target and Target.Character and Target.Character.Humnoid and Target.Character.Humnoid.Health ~= 0 then
+                local HitBox = Target.Character[getgenv().Settings.HitBox]
+                if Hitbox then
+                    Args[3] = Target.Character
+                    Args[4] = HitBox
+                    Args[5] = HitBox.Position
+                end
+            end
+        end
     end
-    return namecall(self, ...)
-end
+        return Old(self, unpack(args))
+end)
 
