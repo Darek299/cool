@@ -1,0 +1,60 @@
+local plr = game:GetService("Players")
+local RS = game:GetService("RunService")
+local Rp = game:GetService("ReplicatedStorage")
+
+local lp = game.Players.LocalPlayer
+local char = lp.Character
+
+local Camera = workspace.CurrentCamera
+local mouse = lp:GetMouse()
+
+local function GetClosest(Fov)
+    local Target, Closest = nil, math.huge
+    for i,v in pairs(game:GetPlayers()) do
+        if (v.Name ~= lp.Name and v.char and v.char.HumanoidRootPart) then
+            local ScreenPos, onScreen = Camera:WorldToScreenPoint(v.char.HumanoidRootPart.Position)
+            local check = (Vector2.new(mouse.X,mouse.Y)- Vector2.new(ScreenPos.X,ScreenPos.Y)).magnitude
+            if (check < Closest then)
+                Closest = check
+                Target = v
+            end
+        end
+    end
+    return Target
+end
+
+local Target
+local CircleInLine = Drawing.new("Circle")
+local CircleOutline = Drawing.new("Circle")
+RunService.Stepped:Connect(function()
+    CircleInLine.Radius = getgenv().Settings.Fov
+    CircleInLine.Thickness = 2
+    CircleInLine.Position = Vector2.new(Mouse.X,Mouse.Y)
+    CircleInLine.Transparency = 1
+    CircleInLine.Color = Color3.fromRGB(255,255,255)
+    CircleInLine.Visible = getgenv().Settings.FovCircle
+    CircleInLine.ZIndex = 2
+
+    CircleOutline.Radius = getgenv().Settings.Fov
+    CircleOutline.Thickness = 4
+    CircleOutline.Position = Vector2.new(Mouse.X, Mouse.Y)
+    CircleOutline.Transparency = 1
+    CircleOutline.Color = Color3.new()
+    CircleOutline.Visible = getgenv().Settings.FovCircle
+    CircleOutline.ZIndex = 1
+
+    Target = GetClosest(getgenv().Settings.Fov)
+end)
+
+local Old = hookmetamethod(game, "__namecall", function(Self, ...))
+    local Args = {...}
+    local Method = getnamecallmethod()
+
+    if not checkcaller() and Method == "FireServer" then
+        Args[1] = GetClosest().Character.Head
+        Args[2] = GetClosest().Character.Head.Position
+        return Self.FireServer(self,unpack(args))
+    end
+    return namecall(self, ...)
+end
+
