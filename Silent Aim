@@ -54,7 +54,7 @@ local Old; Old = hookmetamethod(game, "__namecall", function(Self, ...)
     local Method = getnamecallmethod()
     
     if (not checkcaller() and Method == "FireServer") then
-        if (Self.Name == "0+.") then
+        if (Self.Name == ".gg/untitledhood") then
             Args[1].MessageWarning = {}
             Args[1].MessageError = {}
             Args[1].MessageOutput = {}
